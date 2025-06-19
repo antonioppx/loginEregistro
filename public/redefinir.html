@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Redefinir Senha</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Redefinir Senha</h1>
+    <form id="redefinirForm">
+      <input type="email" id="redEmail" placeholder="E-mail" required><br>
+      <input type="text" id="redCode" placeholder="Código recebido" required><br>
+      <input type="password" id="redNewPassword" placeholder="Nova senha" required><br>
+      <button type="submit" class="btn">Redefinir</button>
+    </form>
+    <div id="msg"></div>
+    <a href="index.html" class="link-voltar">Voltar</a>
+  </div>
+  <script>
+    // Preencher e-mail automaticamente se vier na query string
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    if (emailParam) {
+      document.getElementById('redEmail').value = emailParam;
+    }
+    const msg = document.getElementById('msg');
+    document.getElementById('redefinirForm').onsubmit = async (e) => {
+      e.preventDefault();
+      msg.innerText = '';
+      const email = document.getElementById('redEmail').value;
+      const code = document.getElementById('redCode').value;
+      const newPassword = document.getElementById('redNewPassword').value;
+      const res = await fetch('/api/redefinir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code, newPassword })
+      });
+      const data = await res.json();
+      msg.innerText = data.message || data.error;
+      msg.style.color = data.error ? '#ffbaba' : '#baffba';
+      if (data.message) {
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2500);
+      }
+    };
+  </script>
+</body>
+</html> 
